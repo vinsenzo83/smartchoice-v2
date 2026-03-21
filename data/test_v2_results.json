@@ -1,0 +1,13 @@
+{
+  "context_tests": {
+    "total": 500,
+    "passed": 246,
+    "failed": 0
+  },
+  "ai_tests": {
+    "total": 30,
+    "passed": 30,
+    "failed": 0
+  },
+  "context_failures": []
+}
