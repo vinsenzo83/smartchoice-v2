@@ -15,32 +15,169 @@ DATA_DIR = Path(__file__).parent / "data"
 LEADS_PATH = DATA_DIR / "leads.csv"
 TICKET_PATH = DATA_DIR / "ticket_counter.json"
 
-st.set_page_config(page_title="돈줄 - 인터넷TV 사은품", page_icon="💰", layout="wide")
+st.set_page_config(page_title="돈줄 - 인터넷TV 사은품", page_icon="💰", layout="centered")
 
 st.markdown("""
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
-    .stApp { background-color: #1a1a2e; color: #e0e0e0; }
-    [data-testid="stSidebar"] { display: none; }
-    header { display: none; }
-    .big-title { font-size: 2.5rem; text-align: center; margin-bottom: 0; color: #2ecc71; }
-    .sub-title { text-align: center; color: #aaa; margin-top: 0; font-size: 1.1rem; }
-    [data-testid="stChatMessage"] { background: transparent !important; }
-    [data-testid="stChatMessageContent"] p { color: #e0e0e0; }
-    table { color: #e0e0e0 !important; }
-    th { background: #2a2a4a !important; color: #2ecc71 !important; }
-    td { background: #16213e !important; color: #e0e0e0 !important; }
-    div.stButton > button {
-        border-radius: 24px; border: 1px solid #333;
-        background: #16213e; color: #ccc; font-size: 14px;
-        padding: 8px 16px; transition: all 0.2s;
+    /* ============ 공통 ============ */
+    html, body, .stApp {
+        background: #0d1117 !important;
+        color: #c9d1d9;
+        overflow-x: hidden !important;
+        font-size: 15px !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
+        -webkit-font-smoothing: antialiased;
     }
-    div.stButton > button:hover { border-color: #2ecc71; color: #2ecc71; }
-    div.stButton > button[kind="primary"] { background: #2ecc71; color: #1a1a2e; border: none; font-weight: bold; }
-    .stTextInput input { background: #16213e; color: #e0e0e0; border: 1px solid #333; border-radius: 12px; }
-    .stSelectbox > div > div { background: #16213e; color: #e0e0e0; }
-    code { background: #2ecc71 !important; color: #1a1a2e !important; padding: 4px 10px !important; border-radius: 8px !important; font-weight: bold !important; }
+    [data-testid="stSidebar"], header, footer { display: none !important; }
+
+    .block-container {
+        max-width: 600px !important;
+        padding: 0 0.8rem 5rem !important;
+    }
+    /* 요소간 간격 줄이기 */
+    .stElementContainer { margin-bottom: 0.15rem !important; }
+    .stMarkdown { margin-bottom: 0 !important; }
+
+    /* ---- 헤더 ---- */
+    .hero { text-align: center; padding: 0.6rem 0 0.3rem; }
+    .hero-icon { font-size: 1.6rem; }
+    .hero-title {
+        font-size: 1.2rem; font-weight: 800; margin: 0;
+        background: linear-gradient(135deg, #3fb950, #2ea043);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-sub { color: #7d8590; font-size: 0.7rem; margin-top: 2px; }
+
+    /* ---- 버튼 ---- */
+    div.stButton > button {
+        border-radius: 18px;
+        border: 1px solid #30363d;
+        background: #161b22;
+        color: #c9d1d9;
+        font-size: 13px; font-weight: 600;
+        padding: 6px 4px;
+        min-height: 34px;
+        transition: all 0.2s;
+    }
+    div.stButton > button:hover {
+        border-color: #3fb950; color: #3fb950;
+        background: #1c2128;
+    }
+    div.stButton > button[kind="primary"] {
+        background: #238636 !important; color: #fff !important;
+        border: none; font-weight: 700;
+    }
+    div.stButton > button[kind="primary"]:hover {
+        background: #2ea043 !important;
+    }
+
+    /* ---- 채팅 ---- */
+    [data-testid="stChatMessage"] {
+        background: transparent !important;
+        padding: 0.2rem 0 !important;
+    }
+    [data-testid="stChatMessageContent"] {
+        background: #161b22 !important;
+        border: 1px solid #21262d !important;
+        border-radius: 10px !important;
+        padding: 0.5rem 0.7rem !important;
+    }
+    [data-testid="stChatMessageContent"] p {
+        color: #c9d1d9; font-size: 0.95rem; line-height: 1.65;
+    }
+    [data-testid="stChatMessageContent"] h3 {
+        color: #3fb950; font-size: 1.05rem; margin: 0.5rem 0 0.2rem;
+    }
+    [data-testid="stChatMessageContent"] strong { color: #e6edf3; }
+
+    /* ---- 테이블 ---- */
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 0.82rem !important;
+        color: #c9d1d9 !important;
+        margin: 0.3rem 0 !important;
+    }
+    th {
+        background: #1c2128 !important;
+        color: #3fb950 !important;
+        font-weight: 600 !important;
+        padding: 5px 6px !important;
+        font-size: 0.68rem !important;
+        border-bottom: 2px solid #30363d !important;
+        white-space: nowrap;
+        text-align: left !important;
+    }
+    td {
+        padding: 4px 6px !important;
+        border-bottom: 1px solid #21262d !important;
+        background: transparent !important;
+        color: #c9d1d9 !important;
+        font-size: 0.7rem !important;
+    }
+    tr:hover td { background: rgba(63, 185, 80, 0.04) !important; }
+
+    /* ---- 입력창 (하단 고정) ---- */
+    [data-testid="stChatInput"] {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 999 !important;
+        background: #0d1117 !important;
+        border-top: 1px solid #21262d;
+        padding: 0.4rem !important;
+    }
+    [data-testid="stChatInput"] textarea {
+        font-size: 16px !important;
+        background: #161b22 !important;
+        border: 1px solid #30363d !important;
+        border-radius: 10px !important;
+        color: #e6edf3 !important;
+    }
+
+    /* ---- 폼 ---- */
+    .stTextInput input {
+        background: #161b22; color: #e6edf3;
+        border: 1px solid #30363d; border-radius: 8px;
+        font-size: 16px !important;
+    }
+    .stTextInput input:focus { border-color: #3fb950; }
+    .stSelectbox > div > div { background: #161b22; color: #e6edf3; }
+
+    /* ---- 코드/티켓 ---- */
+    code {
+        background: #238636 !important; color: #fff !important;
+        padding: 2px 8px !important; border-radius: 5px !important;
+        font-weight: 700 !important; font-size: 0.72rem !important;
+    }
+
+    /* ---- 다이얼로그 ---- */
+    [data-testid="stDialog"] > div {
+        background: #161b22 !important;
+        border: 1px solid #30363d; border-radius: 14px !important;
+        width: 95vw !important; max-width: 95vw !important;
+    }
+    [data-testid="stAlert"] { border-radius: 8px !important; font-size: 0.78rem; }
+    [data-testid="stColumn"] { padding: 0 2px !important; }
+
+    /* 모바일에서 columns 가로 배치 강제 */
+    @media (max-width: 640px) {
+        [data-testid="stHorizontalBlock"] {
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            gap: 4px !important;
+        }
+        [data-testid="stColumn"] {
+            flex: 1 1 0 !important;
+            min-width: 0 !important;
+            width: auto !important;
+        }
+    }
+
     .hide-buttons div.stButton { display: none !important; }
-    .hide-buttons [data-testid="stAlert"] { display: none !important; }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -75,50 +212,122 @@ def detect_prov(text):
     return None
 
 
-# ===== 메인 =====
-st.markdown('<p class="big-title">💰 돈줄</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">인터넷·TV 사은품 받고, 요금도 확 줄여드릴게요!</p>', unsafe_allow_html=True)
-
-# 칩
-chips = [("🔴 SKT", "skt", "SKT"), ("🟡 KT", "kt", "KT"), ("🟣 LG U+", "lg", "LG U+"), ("📊 3사 비교", None, "")]
-cols = st.columns(len(chips))
-for i, (label, pkey, prov) in enumerate(chips):
-    with cols[i]:
-        if st.button(label, key=f"chip_{i}", use_container_width=True):
-            q = f"{prov} 인터넷 TV 추천해줘" if prov else "3사 인터넷 TV 요금 비교해줘"
-            if "messages" not in st.session_state:
-                st.session_state.messages = []
-            st.session_state.messages.append({"role": "user", "content": q})
-            if prov:
-                st.session_state["last_provider"] = prov
-            st.session_state["run"] = {"q": q, "pkey": pkey}
-            st.rerun()
-
 # 세션 초기화
-for key, val in [("messages", []), ("show_lead", False), ("last_provider", ""), ("waiting_prov", False), ("pending_q", None)]:
+for key, val in [("messages", []), ("show_lead", False), ("last_provider", ""), ("pending_q", None), ("survey_done", False), ("page", "landing")]:
     if key not in st.session_state:
         st.session_state[key] = val
 
-# 이전 메시지
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"], avatar="💰" if msg["role"] == "assistant" else "🙋"):
-        st.markdown(msg["content"])
+# 랜딩 칩 클릭 처리 (query param) → 설문으로 이동 (통신사 미리 선택)
+_p = st.query_params.get("p")
+if _p and st.session_state.page == "landing":
+    _prov_map = {"skt": "SK", "kt": "KT", "lg": "LG", "compare": "무관"}
+    if _p in _prov_map:
+        st.session_state["sel_provider"] = _prov_map[_p]
+        st.session_state.page = "survey"
+        st.query_params.clear()
+        st.rerun()
 
-# 통신사 선택
-if st.session_state.waiting_prov:
-    with st.chat_message("assistant", avatar="💰"):
-        st.markdown("**어떤 통신사 상품을 보여드릴까요?**")
-        cols = st.columns(4)
-        for i, p in enumerate(["SKT", "KT", "LG U+", "전체 비교"]):
-            with cols[i]:
-                if st.button(p, key=f"prov_{p}", use_container_width=True):
-                    st.session_state.waiting_prov = False
-                    st.session_state.messages.append({"role": "user", "content": p})
-                    pkey = PROVIDER_KEY.get(p)
-                    if p != "전체 비교":
-                        st.session_state.last_provider = p
-                    st.session_state["run"] = {"q": st.session_state.pending_q, "pkey": pkey}
-                    st.session_state.pending_q = None
+# =============================================
+# 페이지 1: 랜딩
+# =============================================
+if st.session_state.page == "landing":
+    st.markdown('<div style="height: 25vh"></div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <div style="font-size: 1.5rem; font-weight: 800; color: #e6edf3;">💰 돈줄</div>
+        <div style="color: #484f58; font-size: 0.72rem; margin-top: 6px;">무엇을 도와드릴까요?</div>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 320px; margin: 0 auto;">
+        <a href="?p=skt" target="_self" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:22px;background:#161b22;border:1px solid #30363d;color:#c9d1d9;font-size:12px;font-weight:600;text-decoration:none;">
+            <span style="width:8px;height:8px;border-radius:50%;background:#E4002B;display:inline-block;"></span> SK 상품보기</a>
+        <a href="?p=kt" target="_self" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:22px;background:#161b22;border:1px solid #30363d;color:#c9d1d9;font-size:12px;font-weight:600;text-decoration:none;">
+            <span style="width:8px;height:8px;border-radius:50%;background:#ED1C24;display:inline-block;"></span> KT 상품보기</a>
+        <a href="?p=lg" target="_self" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:22px;background:#161b22;border:1px solid #30363d;color:#c9d1d9;font-size:12px;font-weight:600;text-decoration:none;">
+            <span style="width:8px;height:8px;border-radius:50%;background:#E6007E;display:inline-block;"></span> LG 상품보기</a>
+        <a href="?p=compare" target="_self" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:22px;background:#161b22;border:1px solid #30363d;color:#c9d1d9;font-size:12px;font-weight:600;text-decoration:none;">
+            <span style="font-size:10px;">📊</span> 3사 비교</a>
+    </div>
+    """, unsafe_allow_html=True)
+
+# =============================================
+# 페이지 2: 설문
+# =============================================
+elif st.session_state.page == "survey":
+    st.markdown("""<style>
+        /* 라디오 버튼 컴팩트하게 */
+        .survey-page [data-testid="stRadio"] > div { gap: 0.3rem !important; }
+        .survey-page [data-testid="stRadio"] label {
+            font-size: 0.7rem !important;
+            padding: 0 !important;
+        }
+        .survey-page [data-testid="stRadio"] p { font-size: 0.72rem !important; }
+        .survey-page .stElementContainer { margin-bottom: 0rem !important; }
+    </style><div class="survey-page">""", unsafe_allow_html=True)
+
+    st.markdown("""
+    <div style="text-align:center; padding: 0.8rem 0 0.3rem;">
+        <span style="font-size:1rem;">💰</span>
+        <span style="font-size:0.9rem; font-weight:700; color:#e6edf3;"> 돈줄</span>
+    </div>
+    <div style="background:#161b22; border:1px solid #21262d; border-radius:12px; padding:0.7rem 0.9rem; margin-bottom:0.8rem;">
+        <span style="font-size:0.82rem; color:#c9d1d9; line-height:1.5;">
+            안녕하세요! 💰 <b>돈줄</b>이에요~<br>
+            사은품 최대로 챙겨드릴게요!<br>
+            아래만 선택하면 딱 맞는 상품 추천해드릴게요 👇
+        </span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    family = st.radio("🏠 가족 수", ["1인", "2인", "3~4인", "5인+"], horizontal=True, key="sel_family", index=None)
+    usage = st.radio("🖥 용도", ["웹서핑", "OTT", "게임"], horizontal=True, key="sel_usage", index=None)
+    tv = st.radio("📺 TV", ["필요", "불필요"], horizontal=True, key="sel_tv", index=None)
+    provider = st.radio("📶 통신사", ["무관", "SK", "KT", "LG"], horizontal=True, key="sel_provider",
+                        index=["무관", "SK", "KT", "LG"].index(st.session_state.get("sel_provider")) if st.session_state.get("sel_provider") in ["무관", "SK", "KT", "LG"] else None)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    all_selected = family and usage and tv and provider
+    if all_selected:
+        if st.button("✅ 추천 받기", type="primary", use_container_width=True, key="survey_submit"):
+            st.session_state.survey_done = True
+            st.session_state.page = "chat"
+            prov_map = {"SK": "SKT", "KT": "KT", "LG": "LG U+", "무관": "상관없음"}
+            prov_name = prov_map.get(provider, "상관없음")
+            pending = st.session_state.get("pending_q", "")
+            q = f"{pending + ' / ' if pending else ''}{family} 가구, {usage} 위주, TV {'필요' if tv == '필요' else '불필요'}, 통신사 {prov_name}"
+            st.session_state.messages.append({"role": "user", "content": q})
+            prov_detect = {"SK": "skt", "KT": "kt", "LG": "lg"}.get(provider)
+            if prov_detect:
+                st.session_state.last_provider = prov_name
+            st.session_state["run"] = {"q": q, "pkey": prov_detect}
+            st.rerun()
+
+# =============================================
+# 페이지 3: 채팅
+# =============================================
+elif st.session_state.page == "chat":
+    for msg in st.session_state.messages:
+        with st.chat_message(msg["role"], avatar="💰" if msg["role"] == "assistant" else "🙋"):
+            st.markdown(msg["content"])
+
+    # 설문 안 했으면 채팅 아래에 설문 표시
+    if not st.session_state.survey_done and len(st.session_state.messages) >= 2:
+        with st.expander("🎯 맞춤 추천 받기 — 선택하면 딱 맞는 상품 추천해드려요!", expanded=True):
+            family = st.radio("🏠 가족 수", ["1인", "2인", "3~4인", "5인+"], horizontal=True, key="sel_family2", index=None)
+            usage = st.radio("🖥 용도", ["웹서핑", "OTT", "게임"], horizontal=True, key="sel_usage2", index=None)
+            tv = st.radio("📺 TV", ["필요", "불필요"], horizontal=True, key="sel_tv2", index=None)
+            provider = st.radio("📶 통신사", ["무관", "SK", "KT", "LG"], horizontal=True, key="sel_provider2", index=None)
+            if family and usage and tv and provider:
+                if st.button("✅ 추천 받기", type="primary", use_container_width=True, key="survey_chat"):
+                    st.session_state.survey_done = True
+                    prov_map = {"SK": "SKT", "KT": "KT", "LG": "LG U+", "무관": "상관없음"}
+                    prov_name = prov_map.get(provider, "상관없음")
+                    q = f"{family} 가구, {usage} 위주, TV {'필요' if tv == '필요' else '불필요'}, 통신사 {prov_name}"
+                    st.session_state.messages.append({"role": "user", "content": q})
+                    prov_detect = {"SK": "skt", "KT": "kt", "LG": "lg"}.get(provider)
+                    if prov_detect:
+                        st.session_state.last_provider = prov_name
+                    st.session_state["run"] = {"q": q, "pkey": prov_detect}
                     st.rerun()
 
 # 상품번호 → 상품정보 조회
@@ -241,51 +450,48 @@ if st.session_state.get("best_pids"):
         if st.button("📋 연락받기", key="best_callback", use_container_width=True, disabled=not _has):
             callback_dialog()
 
-# 채팅 입력
-if not st.session_state.waiting_prov:
-    prompt = st.chat_input("💬 인터넷·TV 사은품, 요금 뭐든 물어보세요!")
-    if prompt:
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user", avatar="🙋"):
-            st.markdown(prompt)
-
+# 채팅 입력 (설문 페이지에서는 숨김)
+if st.session_state.page == "survey":
+    st.markdown('<style>[data-testid="stChatInput"]{display:none !important;}</style>', unsafe_allow_html=True)
+prompt = st.chat_input("💬 인터넷·TV 사은품, 요금 뭐든 물어보세요!")
+if prompt:
+    # 채팅 입력은 항상 AI가 바로 답변
+    if st.session_state.page == "landing":
+        st.session_state.page = "chat"
+        st.session_state.survey_done = True
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user", avatar="🙋"):
+        st.markdown(prompt)
         prov = detect_prov(prompt)
         if not prov and st.session_state.last_provider:
             prov = st.session_state.last_provider
+        pkey = PROVIDER_KEY.get(prov)
+        if prov:
+            st.session_state.last_provider = prov
 
-        if any(kw in prompt for kw in NEED_KW) and not prov:
-            st.session_state.pending_q = prompt
-            st.session_state.waiting_prov = True
-            st.rerun()
-        else:
-            pkey = PROVIDER_KEY.get(prov)
-            if prov:
-                st.session_state.last_provider = prov
+        with st.chat_message("assistant", avatar="💰"):
+            if not os.environ.get("ANTHROPIC_API_KEY"):
+                st.warning("API Key 필요!")
+            else:
+                with st.spinner("💰 답변 준비 중..."):
+                    try:
+                        answer = ask(prompt, provider_key=pkey, chat_history=st.session_state.messages)
+                        st.markdown(answer)
+                        st.session_state.messages.append({"role": "assistant", "content": answer})
+                    except Exception as e:
+                        st.error(f"오류: {e}")
 
-            with st.chat_message("assistant", avatar="💰"):
-                if not os.environ.get("ANTHROPIC_API_KEY"):
-                    st.warning("API Key 필요!")
-                else:
-                    with st.spinner("💰 답변 준비 중..."):
-                        try:
-                            answer = ask(prompt, provider_key=pkey, chat_history=st.session_state.messages)
-                            st.markdown(answer)
-                            st.session_state.messages.append({"role": "assistant", "content": answer})
-                        except Exception as e:
-                            st.error(f"오류: {e}")
-
-            if any(kw in prompt for kw in NEED_KW):
-                import re as _re
-                _bpids = []
-                for _line in answer.split("\n"):
-                    if "🥇" in _line or "🥈" in _line or "1위" in _line or "2위" in _line or "추천" in _line or "상담 신청" in _line:
-                        _bpids.extend(_re.findall(r'[SKL]\d{3}', _line))
-                if not _bpids:
-                    _bpids = _re.findall(r'[SKL]\d{3}', answer)
-                st.session_state["best_pids"] = list(dict.fromkeys(_bpids))[:2]
-                st.session_state["selected_pid"] = ""
-                st.session_state["selected_info"] = ""
-                st.rerun()
-
-    pass  # 상담 버튼은 아래 통합
+    # 추천 상품번호 추출
+    import re as _re
+    _bpids = []
+    for _line in answer.split("\n"):
+        if any(kw in _line for kw in ["🥇", "🥈", "추천 1", "추천 2"]):
+            _bpids.extend(_re.findall(r'[SKL]\d{3}', _line))
+    if not _bpids:
+        _bpids = _re.findall(r'[SKL]\d{3}', answer)
+    if _bpids:
+        st.session_state["best_pids"] = list(dict.fromkeys(_bpids))[:2]
+        st.session_state["selected_pid"] = ""
+        st.session_state["selected_info"] = ""
+        st.rerun()
 
